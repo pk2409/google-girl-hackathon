@@ -29,7 +29,7 @@ def get_response(user_input: str) -> str:
     
     prompt = "\n".join(conversation_history)
     
-    client = genai.Client(api_key="AIzaSyAAe-WQyIvOHdxAgB5AnqZ4BcGsoCBQG6c")
+    client = genai.Client(api_key="")
     
     response = client.models.generate_content(
         model="gemini-2.0-flash",
