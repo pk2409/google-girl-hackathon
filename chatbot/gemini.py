@@ -3,7 +3,7 @@ from google.genai import types
 
 conversation_history = []
 
-MAX_TOKENS = 100 
+MAX_TOKENS = 1000
 
 def count_tokens(text: str) -> int:
    
@@ -29,7 +29,7 @@ def get_response(user_input: str) -> str:
     
     prompt = "\n".join(conversation_history)
     
-    client = genai.Client(api_key="")
+    client = genai.Client(api_key="AIzaSyAAe-WQyIvOHdxAgB5AnqZ4BcGsoCBQG6c")
     
     response = client.models.generate_content(
         model="gemini-2.0-flash",
@@ -47,5 +47,3 @@ def get_response(user_input: str) -> str:
     conversation_history = trim_history(conversation_history, MAX_TOKENS)
     
     return assistant_reply
-
-
