@@ -1,5 +1,6 @@
 import streamlit as st
 import gemini 
+from PIL import Image
 
 st.set_page_config(page_title="💬 Medical AI Chatbot", page_icon="🩺", layout="wide")
 
@@ -72,7 +73,7 @@ if "user_input" not in st.session_state:
     st.session_state.user_input = ""
 
 chat_container = st.container()
-if "history" in st.session_state and st.session_state.history:  # Check if history exists and is not empty
+if "history" in st.session_state and st.session_state.history:  
     with chat_container:
         chat_html = '<div class="chat-container">'
         for msg in st.session_state.history:
@@ -81,7 +82,7 @@ if "history" in st.session_state and st.session_state.history:  # Check if histo
             else:
                 chat_html += f'<div class="assistant-msg">{msg["content"]}</div>'
         chat_html += '</div>'
-        st.markdown(chat_html, unsafe_allow_html=True)  # Render only if messages exist
+        st.markdown(chat_html, unsafe_allow_html=True) 
 
 
 def submit_message():
@@ -94,4 +95,19 @@ def submit_message():
         st.session_state.user_input = ""
 
 
-st.text_input("Type your message here...", key="user_input", on_change=submit_message, help="Press Enter to send.")
+user_input = st.text_input("Type your message here...", key="user_input", on_change=submit_message, help="Press Enter to send.")
+st.subheader("Image-based Diagnosis")
+uploaded_file = st.file_uploader("Upload an image (e.g., X-ray, MRI, skin photo)", type=["png", "jpg", "jpeg"])
+
+if uploaded_file:
+    image = Image.open(uploaded_file)
+    st.image(image, caption="Uploaded Image", use_column_width=True)
+    
+    diagnosis_model = select_model(user_input) if user_input else None
+    
+    if diagnosis_model:
+        pred_class, preds = predict_with_model(diagnosis_model, image)
+        st.write("Diagnosis Prediction:", pred_class)
+        st.write("Prediction Details:", preds)
+    else:
+        st.write("No appropriate model found for the given input. Please refine your query.")
