@@ -1,6 +1,8 @@
 import streamlit as st
 import gemini
 from PIL import Image
+import base64
+import io
 
 # Page configuration with a medical theme
 st.set_page_config(
@@ -113,11 +115,22 @@ st.markdown(
             transform: translateY(-2px);
         }
         
-        /* File uploader styling */
+        /* File uploader styling - smaller and compact */
+        .stFileUploader>div>div {
+            padding: 5px !important;
+            display: flex !important;
+            align-items: center !important;
+        }
+        
+        .stFileUploader>div>div>button {
+            padding: 0px 10px !important;
+            font-size: 0.8rem !important;
+            height: 35px !important;
+            margin-left: 5px !important;
+        }
+        
         .uploadedFile {
-            border: 2px dashed #3b82f6 !important;
-            border-radius: 10px !important;
-            padding: 20px !important;
+            display: none !important;
         }
         
         /* Card styling for sections */
@@ -162,6 +175,62 @@ st.markdown(
             color: #64748b;
             margin-top: 30px;
         }
+        
+        /* Health tips cards */
+        .health-tip-card {
+            background: linear-gradient(45deg, #EFF6FF 0%, #DBEAFE 100%);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #3b82f6;
+        }
+        
+        .tip-title {
+            color: #1e40af;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+        
+        /* Hide upload message */
+        .upload-message {
+            display: none !important;
+        }
+        
+        /* Custom file upload button */
+        .custom-file-button {
+            background-color: #3b82f6;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            transition: all 0.2s ease;
+        }
+        
+        .custom-file-button:hover {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        /* Input row */
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Image display in chat */
+        .chat-image {
+            margin: 10px 0;
+            border-radius: 10px;
+            max-width: 250px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
     </style>
     """,
     unsafe_allow_html=True,
@@ -185,8 +254,62 @@ if "history" not in st.session_state:
 if "user_input" not in st.session_state:
     st.session_state.user_input = ""
 
-# Create two columns for chat and image analysis
-col1, col2 = st.columns([2, 1])
+if "image_data" not in st.session_state:
+    st.session_state.image_data = {}
+
+# Function to convert image to base64 for displaying in HTML
+def get_image_base64(image):
+    # Create a copy of the image
+    img_copy = image.copy()
+    
+    # Convert RGBA to RGB if needed
+    if img_copy.mode == 'RGBA':
+        # Create a white background
+        background = Image.new('RGB', img_copy.size, (255, 255, 255))
+        # Paste the image on the background using alpha as mask
+        background.paste(img_copy, mask=img_copy.split()[3])
+        img_copy = background
+    
+    # Save as JPEG
+    buffered = io.BytesIO()
+    img_copy.save(buffered, format="JPEG")
+    img_str = base64.b64encode(buffered.getvalue()).decode()
+    return img_str
+
+# Function to handle image uploads - will add to chat
+def process_uploaded_image():
+    if st.session_state.uploaded_file is not None:
+        # Process the image
+        image = Image.open(st.session_state.uploaded_file)
+        
+        # Convert image to base64 for display in HTML
+        img_base64 = get_image_base64(image)
+        
+        # Generate a unique image ID
+        image_id = f"img_{len(st.session_state.image_data) + 1}"
+        
+        # Store the image data
+        st.session_state.image_data[image_id] = img_base64
+        
+        # Add a user message showing the image was uploaded
+        user_message = f"I've uploaded an image for analysis."
+        
+        # In a real app, you would get a response from your model
+        try:
+            # Here you would analyze the image using your model
+            assistant_reply = "I've analyzed your uploaded image. Based on what I can see, this appears to be a medical scan. For a proper diagnosis, I recommend consulting with a healthcare professional. Would you like me to provide some general information about what this type of image typically shows?"
+        except:
+            assistant_reply = "I've received your image. For accurate analysis of medical images, please consult with a healthcare professional. Would you like some general information about interpreting these types of images?"
+        
+        # Add to chat history with image reference
+        st.session_state.history.append({"role": "user", "content": user_message, "image": True, "image_id": image_id})
+        st.session_state.history.append({"role": "assistant", "content": assistant_reply})
+        
+        # Clear the file uploader
+        # st.session_state.uploaded_file = None
+
+# Main column layout - now simpler
+col1, col2 = st.columns([3, 1])
 
 with col1:
     st.markdown('<div class="card-header">Chat Consultation</div>', unsafe_allow_html=True)
@@ -199,7 +322,17 @@ with col1:
             chat_html = '<div class="chat-container">'
             for msg in st.session_state.history:
                 if msg["role"] == "user":
-                    chat_html += f'<div class="user-msg">{msg["content"]}</div>'
+                    if "image" in msg and msg["image"] and "image_id" in msg:
+                        # For messages with an image uploaded
+                        chat_html += f'<div class="user-msg">{msg["content"]}'
+                        image_id = msg["image_id"]
+                        if image_id in st.session_state.image_data:
+                            img_base64 = st.session_state.image_data[image_id]
+                            chat_html += f'<br><img src="data:image/jpeg;base64,{img_base64}" class="chat-image" alt="Uploaded medical image">'
+                        chat_html += '</div>'
+                    else:
+                        # Regular text messages
+                        chat_html += f'<div class="user-msg">{msg["content"]}</div>'
                 else:
                     chat_html += f'<div class="assistant-msg">{msg["content"]}</div>'
             chat_html += '<div style="clear: both;"></div></div>'
@@ -215,7 +348,7 @@ with col1:
             unsafe_allow_html=True
         )
 
-    # Message input and send button
+    # Message input and buttons in a row
     def submit_message():
         if st.session_state.user_input:
             user_message = st.session_state.user_input
@@ -232,7 +365,8 @@ with col1:
             st.session_state.user_input = ""
 
     # Input area with columns for better layout
-    input_col1, input_col2 = st.columns([5, 1])
+    input_col1, input_col2, input_col3 = st.columns([10, 1, 1])
+    
     with input_col1:
         st.text_input(
             "Type your message here...",
@@ -240,52 +374,49 @@ with col1:
             on_change=submit_message,
             placeholder="Describe your symptoms or ask a medical question..."
         )
+    
     with input_col2:
-        if st.button("Send 📤"):
+        if st.button("Send"):
             submit_message()
-
-with col2:
-    st.markdown('<div class="card-header">Visual Diagnosis</div>', unsafe_allow_html=True)
-    
-    # Image upload section
-    st.markdown('<div class="card">', unsafe_allow_html=True)
-    uploaded_file = st.file_uploader(
-        "Upload a medical image",
-        type=["png", "jpg", "jpeg"],
-        help="Upload X-rays, MRIs, CT scans, skin photos, etc."
-    )
-    
-    if uploaded_file:
-        image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded Image", use_column_width=True)
-        
-        with st.spinner("Analyzing image..."):
-            # Placeholder for model selection and prediction
-            # In a real implementation, you would connect this to your models
-            st.markdown("#### Analysis Results")
             
-            # Simulated results - in real app these would come from your ML model
-            st.markdown("""
-            <div style="background-color: #f0f9ff; padding: 15px; border-radius: 10px; border-left: 4px solid #3b82f6;">
-                <h4 style="margin-top: 0; color: #1e40af;">Preliminary Assessment</h4>
-                <p>The image analysis suggests further evaluation may be needed. Please consult with a healthcare professional for an accurate diagnosis.</p>
-            </div>
-            """, unsafe_allow_html=True)
-    else:
-        st.markdown(
-            """
-            <div style="text-align: center; padding: 30px; color: #64748b;">
-                <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
-                    <polyline points="21 15 16 10 5 21"></polyline>
-                </svg>
-                <p>Upload a medical image for AI-assisted analysis</p>
-            </div>
-            """, 
-            unsafe_allow_html=True
-        )
-    st.markdown('</div>', unsafe_allow_html=True)
+    # with input_col3:
+        # File uploader (styled to be small)
+    uploaded_file = st.file_uploader(
+        "",
+        type=["png", "jpg", "jpeg"],
+        key="uploaded_file",
+        on_change=process_uploaded_image,
+        label_visibility="collapsed"
+    )
+        
+with col2:
+    st.markdown('<div class="card-header">Health Tips</div>', unsafe_allow_html=True)
+    
+    # Health tips cards instead of visual diagnosis
+    st.markdown(
+        """
+        <div class="health-tip-card">
+            <div class="tip-title">🔍 When to Seek Help</div>
+            <p>Persistent symptoms, severe pain, difficulty breathing, or sudden changes require immediate medical attention.</p>
+        </div>
+        
+        <div class="health-tip-card">
+            <div class="tip-title">🧠 Mental Health Matters</div>
+            <p>Your mental wellbeing is as important as physical health. Speak to a professional if you're struggling.</p>
+        </div>
+        
+        <div class="health-tip-card">
+            <div class="tip-title">💊 Medication Safety</div>
+            <p>Always take medications as prescribed. Don't stop without consulting your doctor.</p>
+        </div>
+        
+        <div class="health-tip-card">
+            <div class="tip-title">⚠️ AI Limitations</div>
+            <p>This assistant provides information only. Always consult healthcare professionals for diagnosis and treatment.</p>
+        </div>
+        """, 
+        unsafe_allow_html=True
+    )
 
 # Footer
 st.markdown(
