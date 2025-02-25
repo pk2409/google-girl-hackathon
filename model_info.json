@@ -1,0 +1,185 @@
+{
+  "models": [
+    {
+      "model_name": "Pancreatic Cancer Disease Detection",
+      "model_file": "model12.h5",
+      "prediction_function": "model.predict(X_test)",
+      "input_features": [
+        "sample_id",
+        "patient_cohort",
+        "sample_origin",
+        "age",
+        "sex",
+        "diagnosis",
+        "stage",
+        "benign_sample_diagnosis",
+        "plasma_CA19_9",
+        "creatinine"
+      ]
+    },
+    {
+      "model_name": "Asthma Disease Prediction",
+      "model_file": "model11.h5",
+      "prediction_function": "model.predict(x_test)",
+      "input_features": [
+        "Tiredness",
+        "Dry-Cough",
+        "Difficulty-in-Breathing",
+        "Sore-Throat",
+        "None_Sympton",
+        "Pains",
+        "Nasal-Congestion",
+        "Runny-Nose",
+        "None_Experiencing",
+        "Age_0-9"
+      ]
+    },
+    {
+      "model_name": "Alzheimer's Disease Prediction",
+      "model_file": "model10.h5",
+      "prediction_function": "best_model.predict(X_test)",
+      "input_features": [
+        "patient_id",
+        "age",
+        "gender",
+        "ethnicity",
+        "education_level",
+        "bmi",
+        "smoking",
+        "alcohol_consumption",
+        "physical_activity",
+        "diet_quality"
+      ]
+    },
+    {
+      "model_name": "Step by Step Diabetes Classification",
+      "model_file": "model9.h5",
+      "prediction_function": "knn.predict(X_test)",
+      "input_features": [
+        "Pregnancies",
+        "Glucose",
+        "BloodPressure",
+        "SkinThickness",
+        "Insulin",
+        "BMI",
+        "DiabetesPedigreeFunction",
+        "Age"
+      ]
+    },
+    {
+      "model_name": "Thyroid Disease Detection",
+      "model_file": "model8.h5",
+      "prediction_function": "model.predict(x_test)",
+      "input_features": [
+        "age",
+        "sex",
+        "on thyroxine",
+        "query on thyroxine",
+        "on antithyroid medication",
+        "sick",
+        "pregnant",
+        "thyroid surgery",
+        "treatment",
+        "query hypothyroid",
+        "query hyperthyroid",
+        "lithium",
+        "goitre",
+        "tumor",
+        "hypopituitary",
+        "psych",
+        "TSH measured",
+        "TSH",
+        "T3 measured",
+        "T3",
+        "TT4 measured",
+        "TT4",
+        "T4U measured",
+        "T4U",
+        "FTI measured",
+        "FTI",
+        "TBG measured",
+        "TBG",
+        "referral source"
+      ]
+    },
+    {
+      "model_name": "Parkinson’s Disease Prediction",
+      "model_file": "model7.h5",
+      "prediction_function": "model.predict(x_test)",
+      "input_features": [
+        "MDVP:Fo(Hz)",
+        "MDVP:Fhi(Hz)",
+        "MDVP:Flo(Hz)",
+        "MDVP:Jitter(%)",
+        "MDVP:Jitter(Abs)",
+        "MDVP:RAP",
+        "MDVP:PPQ",
+        "Jitter:DDP",
+        "MDVP:Shimmer",
+        "MDVP:Shimmer(dB)",
+        "Shimmer:APQ3",
+        "Shimmer:APQ5",
+        "MDVP:APQ",
+        "Shimmer:DDA",
+        "NHR",
+        "HNR",
+        "RPDE",
+        "D2",
+        "DFA",
+        "spread1",
+        "spread2",
+        "D2",
+        "PPE"
+      ]
+    },
+    {
+      "model_name": "Chronic Kidney Disease Detection",
+      "model_file": "model6.h5",
+      "prediction_function": "knn.predict(X_train)",
+      "input_features": [
+        "age",
+        "blood_pressure",
+        "specific_gravity",
+        "albumin",
+        "sugar",
+        "red_blood_cells",
+        "pus_cell",
+        "pus_cell_clumps",
+        "bacteria",
+        "blood_glucose_random",
+        "blood_urea",
+        "serum_creatinine",
+        "sodium",
+        "potassium",
+        "haemoglobin",
+        "packed_cell_volume",
+        "white_blood_cell_count",
+        "red_blood_cell_count",
+        "hypertension",
+        "diabetes_mellitus",
+        "coronary_artery_disease",
+        "appetite",
+        "peda_edema",
+        "aanemia",
+        "class"
+      ]
+    },
+    {
+      "model_name": "Liver Disease Prediction",
+      "model_file": "model5.h5",
+      "prediction_function": "LogisticRegression(C=1, penalty='l1')",
+      "input_features": [
+        "Age",
+        "Gender",
+        "Total_Bilirubin",
+        "Direct_Bilirubin",
+        "Alkaline_Phosphotase",
+        "Alamine_Aminotransferase",
+        "Aspartate_Aminotransferase",
+        "Total_Protiens",
+        "Albumin",
+        "Albumin_and_Globulin_Ratio"
+      ]
+    }
+  ]
+}
