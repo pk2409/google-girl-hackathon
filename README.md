@@ -1,4 +1,4 @@
-# AI-Powered Diagnostic Assistant
+# MediChat AI Assistant
 
 ## Overview
 The AI-Powered Diagnostic Assistant is an intelligent chatbot-based system designed to assist in disease detection using both text-based symptom analysis and image-based medical scan evaluation. The system integrates multiple AI models to provide an accurate and data-driven diagnosis, reducing diagnostic errors and enhancing healthcare accessibility.
