@@ -72,7 +72,7 @@ def run_ml_models(model_selections):
         feature_values = model_info["feature_values"]
         
         if model_name in ML_MODELS:
-            # Run the prediction function for this model
+          
             try:
                 prediction = ML_MODELS[model_name]["pred"](feature_values)
                 results[model_name] = prediction
