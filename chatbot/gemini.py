@@ -94,7 +94,7 @@ def get_response(user_input: str) -> str:
     conversation_history = trim_history(conversation_history, MAX_TOKENS)
     
  
-    client = genai.Client(api_key="AIzaSyAAe-WQyIvOHdxAgB5AnqZ4BcGsoCBQG6c")
+    client = genai.Client(api_key="")
     
    
     main_prompt = f"""
