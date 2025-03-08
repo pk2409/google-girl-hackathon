@@ -1,8 +1,37 @@
 import streamlit as st
-import gemini
+import gemini_ai
 from PIL import Image
 import base64
 import io
+
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from gemini_ai import get_response  # Adjust based on your chatbot logic
+
+app = Flask(__name__)
+CORS(app)  # Allow frontend access
+
+@app.route("/chatbot", methods=["POST"])
+def chatbot():
+    data = request.json
+    message = data.get("message", "")
+    # reply = get_response(message)  # Modify as per your chatbot logic
+    # bot_response={
+    #     "response":reply.text
+    # }
+    try:
+        
+        response = get_response(message)
+
+        # Extracting the response text
+        bot_response = response
+    except Exception as e:
+        bot_response = f"Error: {str(e)}"
+    return jsonify({"response": bot_response})
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
 
 # Page configuration with a medical theme
 st.set_page_config(
@@ -355,7 +384,7 @@ with col1:
             
             # In a real app, you would get a response from your model
             try:
-                assistant_reply = gemini.get_response(user_message)
+                assistant_reply = gemini_ai.get_response(user_message)
             except:
                 # Fallback response if gemini module fails
                 assistant_reply = "I understand your concern. Based on the information you've provided, I recommend discussing these symptoms with a healthcare professional. Would you like me to provide some general information on this topic?"
@@ -427,3 +456,4 @@ st.markdown(
     """, 
     unsafe_allow_html=True
 )
+

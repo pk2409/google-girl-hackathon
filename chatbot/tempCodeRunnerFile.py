@@ -1,0 +1,1 @@
+print(genai.api_key) 

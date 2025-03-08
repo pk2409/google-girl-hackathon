@@ -1,7 +1,14 @@
+# import google.generativeai as genai
+
+
 from google import genai
+# import google.generativeai as genai
 from google.genai import types
+
+
 import numpy as np
 import pandas as pd
+import json
 
 # Initialize conversation history
 conversation_history = []
@@ -151,7 +158,14 @@ def get_response(user_input: str) -> str:
     print(response)
     # Parse the response
     try:
-        analysis = eval(response.text.strip())
+        #analysis = eval(response.text.strip())
+        response_text = response.candidates[0].content.parts[0].text.strip()
+    
+    # Remove code block markers if present
+        if response_text.startswith("```json") and response_text.endswith("```"):
+            response_text = response_text[7:-3].strip()
+        
+        analysis = json.loads(response_text)
         
         if analysis["has_symptoms"]:
             # Run the ML models with the provided feature values
