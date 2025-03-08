@@ -1,11 +1,15 @@
 # import google.generativeai as genai
 
-from prediction_functions import prediction_liver
-
 
 from google import genai
 # import google.generativeai as genai
 from google.genai import types
+
+
+
+
+pending_features = {}  # Stores missing features for each user
+collected_feature_values = {}  # Stores collected values
 
 
 import numpy as np
@@ -13,58 +17,16 @@ import pandas as pd
 import json
 
 # Initialize conversation history
-pending_features = {}  # Stores missing features for each user
-collected_feature_values = {}  # Stores collected values
 conversation_history = []
 
 # Maximum token limit
 MAX_TOKENS = 1000
 
 # Define ML models with their prediction functions
-# ML_MODELS = {
-#     "SymptomClassifier": {
-#         "input_features": ["symptom_text", "duration_days", "severity_scale", "patient_age", "patient_gender"],
-#         "pred": lambda features: "Respiratory" if "cough" in features["symptom_text"].lower() else 
-#                                 "Digestive" if "nausea" in features["symptom_text"].lower() else
-#                                 "Neurological" if "headache" in features["symptom_text"].lower() else
-#                                 "Cardiovascular" if "chest pain" in features["symptom_text"].lower() else
-#                                 "General"
-#     },
-#     "DiagnosticPredictor": {
-#         "input_features": ["symptoms_list", "vital_signs", "patient_history", "age", "gender"],
-#         "pred": lambda features: {
-#             "primary": "Common Cold" if "cough" in features["symptoms_list"] and "runny nose" in features["symptoms_list"] else
-#                       "Migraine" if "headache" in features["symptoms_list"] and features.get("patient_history", "").lower().find("migraine") >= 0 else
-#                       "Gastritis" if "abdominal pain" in features["symptoms_list"] and "nausea" in features["symptoms_list"] else
-#                       "Hypertension" if features.get("vital_signs", {}).get("blood_pressure_systolic", 120) > 140 else
-#                       "Unknown",
-#             "confidence": 0.85,
-#             "alternatives": ["Flu", "Allergic Rhinitis", "Sinusitis"]
-#         }
-#     },
-#     "SeverityEstimator": {
-#         "input_features": ["symptoms", "duration", "progression_rate", "pain_level", "age"],
-#         "pred": lambda features: {
-#             "score": min(9, 1 + int(features.get("duration", 1)/2) + int(features.get("pain_level", 0))),
-#             "urgency": "High" if int(features.get("pain_level", 0)) > 7 else
-#                       "Medium" if int(features.get("pain_level", 0)) > 4 else
-#                       "Low"
-#         }
-#     },
-#     "TreatmentRecommender": {
-#         "input_features": ["diagnosis", "patient_age", "patient_gender", "medical_history", "current_medications"],
-#         "pred": lambda features: {
-#             "recommendations": [
-#                 "Rest and hydration" if features["diagnosis"] in ["Common Cold", "Flu"] else None,
-#                 "Over-the-counter pain relievers" if features["diagnosis"] in ["Headache", "Migraine", "Common Cold"] else None,
-#                 "Prescription medication" if features["diagnosis"] in ["Hypertension", "Diabetes"] else None,
-#                 "Lifestyle modifications" if features["diagnosis"] in ["Hypertension", "Obesity", "Diabetes"] else None,
-#                 "Urgent medical attention" if features["diagnosis"] in ["Stroke", "Heart Attack"] else None
-#             ],
-#             "follow_up": "2 weeks" if features["diagnosis"] in ["Hypertension", "Diabetes"] else "As needed"
-#         }
-#     }
-# }
+
+
+
+
 
 DISEASE_FEATURES = {
     "parkinsons": ["MDVP_Fo_Hz", "MDVP_Fhi_Hz", "MDVP_Flo_Hz", "MDVP_Jitter_percent", 
@@ -162,7 +124,7 @@ def predict_disease(disease_name, model_path, input_data):
         "diabetes": predict_diabetes,
         "thyroid": predict_thyroid,
         "kidney_disease": predict_kidney_disease,
-        "liver_disease": prediction_liver
+        "liver_disease": predict_liver_disease
     }
 
     if disease_name in disease_mapping:
@@ -218,6 +180,9 @@ MODEL_PATHS = {
 
 
 
+
+
+
 def count_tokens(text: str) -> int:
     """Count tokens in the text (simplified)"""
     return len(text.split())
@@ -260,6 +225,7 @@ def get_response(user_input: str) -> str:
 
 
 
+
     if pending_features:
             # Assume one model is pending at a time
             current_model = list(pending_features.keys())[0]
@@ -296,6 +262,16 @@ def get_response(user_input: str) -> str:
                         conversation_history.append("Assistant: " + reply)
                         conversation_history = trim_history(conversation_history, MAX_TOKENS)
                         return reply
+
+
+
+
+
+
+
+
+
+
     
     # Initialize Gemini client
     client = genai.Client(api_key="AIzaSyAAe-WQyIvOHdxAgB5AnqZ4BcGsoCBQG6c")

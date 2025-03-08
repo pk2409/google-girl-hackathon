@@ -6,6 +6,7 @@ import io
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+# import gemini
 from gemini_ai import get_response  # Adjust based on your chatbot logic
 
 app = Flask(__name__)
@@ -33,248 +34,248 @@ if __name__ == "__main__":
     app.run(debug=True)
 
 
-# Page configuration with a medical theme
-st.set_page_config(
-    page_title="💬 MediChat AI Assistant",
-    page_icon="🩺",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+# # Page configuration with a medical theme
+# st.set_page_config(
+#     page_title="💬 MediChat AI Assistant",
+#     page_icon="🩺",
+#     layout="wide",
+#     initial_sidebar_state="expanded"
+# )
 
-# Enhanced CSS styling
-st.markdown(
-    """
-    <style>
-        /* Global styles */
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f0f9ff;
-            color: #1e3a8a;
-        }
+# # Enhanced CSS styling
+# st.markdown(
+#     """
+#     <style>
+#         /* Global styles */
+#         body {
+#             font-family: 'Roboto', sans-serif;
+#             background-color: #f0f9ff;
+#             color: #1e3a8a;
+#         }
         
-        /* Header styling */
-        .main-header {
-            background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            padding: 1.5rem;
-            border-radius: 10px;
-            margin-bottom: 1.5rem;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
+#         /* Header styling */
+#         .main-header {
+#             background: linear-gradient(90deg, #3b82f6 0%, #2563eb 100%);
+#             color: white;
+#             padding: 1.5rem;
+#             border-radius: 10px;
+#             margin-bottom: 1.5rem;
+#             text-align: center;
+#             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+#         }
         
-        .main-header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 0.5rem;
-        }
+#         .main-header h1 {
+#             font-size: 2.5rem;
+#             margin-bottom: 0.5rem;
+#         }
         
-        .main-header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
+#         .main-header p {
+#             font-size: 1.1rem;
+#             opacity: 0.9;
+#         }
         
-        /* Chat container */
-        .chat-container {
-            background: white;
-            padding: 1.5rem;
-            border-radius: 12px;
-            max-height: 500px;
-            overflow-y: auto;
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 1.5rem;
-            border: 1px solid #e5e7eb;
-        }
+#         /* Chat container */
+#         .chat-container {
+#             background: white;
+#             padding: 1.5rem;
+#             border-radius: 12px;
+#             max-height: 500px;
+#             overflow-y: auto;
+#             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.08);
+#             margin-bottom: 1.5rem;
+#             border: 1px solid #e5e7eb;
+#         }
         
-        /* Message bubbles */
-        .user-msg {
-            background-color: #dbeafe;
-            color: #1e40af;
-            padding: 12px 16px;
-            border-radius: 18px 18px 0 18px;
-            margin-bottom: 15px;
-            max-width: 75%;
-            float: right;
-            clear: both;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            font-weight: 500;
-        }
+#         /* Message bubbles */
+#         .user-msg {
+#             background-color: #dbeafe;
+#             color: #1e40af;
+#             padding: 12px 16px;
+#             border-radius: 18px 18px 0 18px;
+#             margin-bottom: 15px;
+#             max-width: 75%;
+#             float: right;
+#             clear: both;
+#             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+#             font-weight: 500;
+#         }
         
-        .assistant-msg {
-            background-color: #eff6ff;
-            color: #1e3a8a;
-            padding: 12px 16px;
-            border-radius: 18px 18px 18px 0;
-            margin-bottom: 15px;
-            max-width: 75%;
-            float: left;
-            clear: both;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-            border-left: 4px solid #3b82f6;
-        }
+#         .assistant-msg {
+#             background-color: #eff6ff;
+#             color: #1e3a8a;
+#             padding: 12px 16px;
+#             border-radius: 18px 18px 18px 0;
+#             margin-bottom: 15px;
+#             max-width: 75%;
+#             float: left;
+#             clear: both;
+#             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+#             border-left: 4px solid #3b82f6;
+#         }
         
-        /* Input field styling */
-        .stTextInput>div>div>input {
-            border: 2px solid #3b82f6 !important;
-            border-radius: 25px !important;
-            padding: 15px 20px !important;
-            font-size: 16px !important;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
-        }
+#         /* Input field styling */
+#         .stTextInput>div>div>input {
+#             border: 2px solid #3b82f6 !important;
+#             border-radius: 25px !important;
+#             padding: 15px 20px !important;
+#             font-size: 16px !important;
+#             transition: all 0.3s ease;
+#             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+#         }
         
-        .stTextInput>div>div>input:focus {
-            border-color: #1d4ed8 !important;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
-        }
+#         .stTextInput>div>div>input:focus {
+#             border-color: #1d4ed8 !important;
+#             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
+#         }
         
-        /* Button styling */
-        .stButton button {
-            background-color: #3b82f6 !important;
-            color: white !important;
-            border-radius: 25px !important;
-            padding: 10px 25px !important;
-            font-weight: 500 !important;
-            border: none !important;
-            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3) !important;
-            transition: all 0.3s ease !important;
-        }
+#         /* Button styling */
+#         .stButton button {
+#             background-color: #3b82f6 !important;
+#             color: white !important;
+#             border-radius: 25px !important;
+#             padding: 10px 25px !important;
+#             font-weight: 500 !important;
+#             border: none !important;
+#             box-shadow: 0 4px 6px rgba(59, 130, 246, 0.3) !important;
+#             transition: all 0.3s ease !important;
+#         }
         
-        .stButton button:hover {
-            background-color: #2563eb !important;
-            transform: translateY(-2px);
-        }
+#         .stButton button:hover {
+#             background-color: #2563eb !important;
+#             transform: translateY(-2px);
+#         }
         
-        /* File uploader styling - smaller and compact */
-        .stFileUploader>div>div {
-            padding: 5px !important;
-            display: flex !important;
-            align-items: center !important;
-        }
+#         /* File uploader styling - smaller and compact */
+#         .stFileUploader>div>div {
+#             padding: 5px !important;
+#             display: flex !important;
+#             align-items: center !important;
+#         }
         
-        .stFileUploader>div>div>button {
-            padding: 0px 10px !important;
-            font-size: 0.8rem !important;
-            height: 35px !important;
-            margin-left: 5px !important;
-        }
+#         .stFileUploader>div>div>button {
+#             padding: 0px 10px !important;
+#             font-size: 0.8rem !important;
+#             height: 35px !important;
+#             margin-left: 5px !important;
+#         }
         
-        .uploadedFile {
-            display: none !important;
-        }
+#         .uploadedFile {
+#             display: none !important;
+#         }
         
-        /* Card styling for sections */
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e5e7eb;
-        }
+#         /* Card styling for sections */
+#         .card {
+#             background: white;
+#             border-radius: 12px;
+#             padding: 20px;
+#             margin-bottom: 20px;
+#             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+#             border: 1px solid #e5e7eb;
+#         }
         
-        .card-header {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1e3a8a;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #dbeafe;
-        }
+#         .card-header {
+#             font-size: 1.2rem;
+#             font-weight: 600;
+#             color: #1e3a8a;
+#             margin-bottom: 15px;
+#             padding-bottom: 10px;
+#             border-bottom: 2px solid #dbeafe;
+#         }
         
-        /* Sidebar styling */
-        .css-1d391kg {
-            background-color: #f1f5f9;
-        }
+#         /* Sidebar styling */
+#         .css-1d391kg {
+#             background-color: #f1f5f9;
+#         }
         
-        /* Status indicator */
-        .status-online {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            background-color: #10b981;
-            border-radius: 50%;
-            margin-right: 6px;
-        }
+#         /* Status indicator */
+#         .status-online {
+#             display: inline-block;
+#             width: 10px;
+#             height: 10px;
+#             background-color: #10b981;
+#             border-radius: 50%;
+#             margin-right: 6px;
+#         }
         
-        /* Footer styling */
-        footer {
-            text-align: center;
-            padding: 15px;
-            font-size: 0.8rem;
-            color: #64748b;
-            margin-top: 30px;
-        }
+#         /* Footer styling */
+#         footer {
+#             text-align: center;
+#             padding: 15px;
+#             font-size: 0.8rem;
+#             color: #64748b;
+#             margin-top: 30px;
+#         }
         
-        /* Health tips cards */
-        .health-tip-card {
-            background: linear-gradient(45deg, #EFF6FF 0%, #DBEAFE 100%);
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid #3b82f6;
-        }
+#         /* Health tips cards */
+#         .health-tip-card {
+#             background: linear-gradient(45deg, #EFF6FF 0%, #DBEAFE 100%);
+#             border-radius: 10px;
+#             padding: 15px;
+#             margin-bottom: 15px;
+#             border-left: 4px solid #3b82f6;
+#         }
         
-        .tip-title {
-            color: #1e40af;
-            font-weight: 600;
-            margin-bottom: 8px;
-            font-size: 1rem;
-        }
+#         .tip-title {
+#             color: #1e40af;
+#             font-weight: 600;
+#             margin-bottom: 8px;
+#             font-size: 1rem;
+#         }
         
-        /* Hide upload message */
-        .upload-message {
-            display: none !important;
-        }
+#         /* Hide upload message */
+#         .upload-message {
+#             display: none !important;
+#         }
         
-        /* Custom file upload button */
-        .custom-file-button {
-            background-color: #3b82f6;
-            color: white;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-            transition: all 0.2s ease;
-        }
+#         /* Custom file upload button */
+#         .custom-file-button {
+#             background-color: #3b82f6;
+#             color: white;
+#             border-radius: 50%;
+#             width: 40px;
+#             height: 40px;
+#             display: flex;
+#             align-items: center;
+#             justify-content: center;
+#             cursor: pointer;
+#             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+#             transition: all 0.2s ease;
+#         }
         
-        .custom-file-button:hover {
-            background-color: #2563eb;
-            transform: translateY(-2px);
-        }
+#         .custom-file-button:hover {
+#             background-color: #2563eb;
+#             transform: translateY(-2px);
+#         }
         
-        /* Input row */
-        .input-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+#         /* Input row */
+#         .input-row {
+#             display: flex;
+#             align-items: center;
+#             gap: 10px;
+#         }
         
-        /* Image display in chat */
-        .chat-image {
-            margin: 10px 0;
-            border-radius: 10px;
-            max-width: 250px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
+#         /* Image display in chat */
+#         .chat-image {
+#             margin: 10px 0;
+#             border-radius: 10px;
+#             max-width: 250px;
+#             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+#         }
+#     </style>
+#     """,
+#     unsafe_allow_html=True,
+# )
 
-# Custom header
-st.markdown(
-    """
-    <div class="main-header">
-        <h1>🩺 MediChat AI Assistant</h1>
-        <p>Your intelligent medical companion for health insights and diagnosis assistance</p>
-    </div>
-    """, 
-    unsafe_allow_html=True
-)
+# # Custom header
+# st.markdown(
+#     """
+#     <div class="main-header">
+#         <h1>🩺 MediChat AI Assistant</h1>
+#         <p>Your intelligent medical companion for health insights and diagnosis assistance</p>
+#     </div>
+#     """, 
+#     unsafe_allow_html=True
+# )
 
 # Initialize session state
 if "history" not in st.session_state:
@@ -384,10 +385,10 @@ with col1:
             
             # In a real app, you would get a response from your model
             try:
-                assistant_reply = gemini_ai.get_response(user_message)
+                assistant_reply = gemini.get_response(user_message)
             except:
                 # Fallback response if gemini module fails
-                assistant_reply = "I understand your concern. Based on the information you've provided, I recommend discussing these symptoms with a healthcare professional. Would you like me to provide some general information on this topic?"
+                assistant_reply = "error"
             
             st.session_state.history.append({"role": "user", "content": user_message})
             st.session_state.history.append({"role": "assistant", "content": assistant_reply})
