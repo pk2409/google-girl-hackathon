@@ -16,7 +16,7 @@ import json
 pending_features = {}  # Stores missing features for each user
 collected_feature_values = {}  # Stores collected values
 conversation_history = []
-
+features={}
 # Maximum token limit
 MAX_TOKENS = 1000
 
@@ -112,8 +112,10 @@ DISEASE_FEATURES = {
 
 # -----------------> defining different portions of our code <---------------
 ML_MODELS = {
-    "DiseaseClassifier": {
-        "input_features": ["symptom_text", "duration_days", "severity_scale", "patient_age", "patient_gender"],
+    "Asthma": {
+        "input_features": ["Tiredness", "Dry-Cough", "Difficulty-in-Breathing", "Sore-Throat", "None_Sympton",
+    "Pains", "Nasal-Congestion", "Runny-Nose", "None_Experiencing", "Age_0-9",
+    "Age_10-19", "Age_20-24", "Age_25-59", "Age_60+", "Gender_Female", "Gender_Male"],
         "pred": lambda features: classify_disease(features)  # Replace with function
     },
     "DiseasePredictor": {
@@ -250,53 +252,13 @@ def run_ml_models(model_selections):
 
 def get_response(user_input: str) -> str:
     """Process user input and generate appropriate response"""
-    global conversation_history
+    global conversation_history, features
     
     # Add user input to conversation history
     conversation_history.append("User: " + user_input)
     
     # Trim history to stay within token limits
     conversation_history = trim_history(conversation_history, MAX_TOKENS)
-
-
-
-    if pending_features:
-            # Assume one model is pending at a time
-            current_model = list(pending_features.keys())[0]
-            features_pending = pending_features[current_model]
-            
-            # Determine the next missing feature (i.e. one with empty value)
-            for feature, value in features_pending.items():
-                if value is None or value == "":
-                    # Update the pending feature with the user's answer
-                    features_pending[feature] = user_input.strip()
-                    break
-            
-            # Check if all missing features have been provided
-            if all(v is not None and v != "" for v in features_pending.values()):
-                # All required features for current_model have been provided.
-                # Create a model selection dictionary to run the model.
-                model_selection = [{
-                    "model_name": current_model,
-                    "feature_values": features_pending
-                }]
-                # Run the model
-                model_result = run_ml_models(model_selection)
-                # Clear pending features for the current model
-                pending_features.pop(current_model)
-                reply = f"Prediction for {current_model}: {model_result[current_model]}"
-                conversation_history.append("Assistant: " + reply)
-                conversation_history = trim_history(conversation_history, MAX_TOKENS)
-                return reply
-            else:
-                # Still missing some features; ask for the next missing feature.
-                for feature, value in features_pending.items():
-                    if value is None or value == "":
-                        reply = f"Please provide the value for '{feature}' for {current_model}."
-                        conversation_history.append("Assistant: " + reply)
-                        conversation_history = trim_history(conversation_history, MAX_TOKENS)
-                        return reply
-    
     # Initialize Gemini client
     client = genai.Client(api_key="AIzaSyAAe-WQyIvOHdxAgB5AnqZ4BcGsoCBQG6c")
     
@@ -316,21 +278,30 @@ def get_response(user_input: str) -> str:
     1. The model name
     2. A list of feature values that can be extracted from the user's input
     3. Default values for any missing required features
-    
+    4. key of features is to be taken from ML_MODELS
+
+     For features_to_be_asked, include only features that:
+    1. Are required by at least one ML model
+    2. Cannot be determined from the user's input
+    3. Are reasonable for the user to know without medical testing
+
     Return your response in this format:
     {{
       "has_symptoms": true/false,
+
       "models_to_run": [
         {{
           "model_name": "ModelName",
-          "feature_values": {{
-            "feature1": "value1",
-            "feature2": "value2",
-            ...
-          }}
         }},
         ...
       ],
+      "features": {{
+        "feature1": "extracted_value1",
+        "feature2": "extracted_value2",
+        ...
+      }},
+      "ask_for_more_data": "Yes/No",
+      "features_to_be_asked": ["feature3", "feature4", ...],
       "direct_response": "Only include this if has_symptoms is false - your direct response to the user"
     }}
     """
@@ -361,21 +332,36 @@ def get_response(user_input: str) -> str:
             response_text = response_text[7:-3].strip()
         
         analysis = json.loads(response_text)
-        
+        features.update(analysis.get("features", {}))
+        runnable_models = []
         if analysis["has_symptoms"]:
+            print("here")
+            print(analysis)
+            for model_name, model_info in ML_MODELS.items():
+                required_features = model_info.get("input_features", [])
+                if all(feature in features and features[feature] for feature in required_features):
+                    model_selection = {
+                        "model_name": model_name,
+                        "feature_values": {feature: features[feature] for feature in required_features}
+                    }
+                    runnable_models.append(model_selection)
+            print(1)
             # Run the ML models with the provided feature values
-            model_results = run_ml_models(analysis["models_to_run"])
-            
+            model_results = run_ml_models(runnable_models)
+            print(2)
             # Construct a prompt for the final medical response
             final_prompt = f"""
             Based on the following ML model predictions for the user's symptoms:
             
             User Input: "{user_input}"
-            
+        
+            Pending Features:
+            "{analysis["features_to_be_asked"]}"
+
             Model Predictions:
             {model_results}
-            
-            Provide a comprehensive medical assessment incorporating these predictions.
+            If Features to be asked is not empty then frame a reply to ask the question to get the features from the user.
+            and then Provide a comprehensive medical assessment incorporating these predictions.
             Explain what each model is suggesting in plain language.
             Include any recommended next steps for the user.
             """
@@ -393,6 +379,9 @@ def get_response(user_input: str) -> str:
             
             assistant_reply = final_response.text.strip()
         else:
+            print("2")
+            print("3")
+            print("4")
             # Use the direct response from the first call
             assistant_reply = analysis["direct_response"]
     except Exception as e:
