@@ -1,6 +1,7 @@
 # import google.generativeai as genai
 
-from prediction_functions import prediction_liver
+from prediction_function_new import predict_liver , predict_asthma , predict_diabetes , predict_alzheimers
+
 
 
 from google import genai
@@ -20,201 +21,132 @@ conversation_history = []
 # Maximum token limit
 MAX_TOKENS = 1000
 
-# Define ML models with their prediction functions
-# ML_MODELS = {
-#     "SymptomClassifier": {
-#         "input_features": ["symptom_text", "duration_days", "severity_scale", "patient_age", "patient_gender"],
-#         "pred": lambda features: "Respiratory" if "cough" in features["symptom_text"].lower() else 
-#                                 "Digestive" if "nausea" in features["symptom_text"].lower() else
-#                                 "Neurological" if "headache" in features["symptom_text"].lower() else
-#                                 "Cardiovascular" if "chest pain" in features["symptom_text"].lower() else
-#                                 "General"
-#     },
-#     "DiagnosticPredictor": {
-#         "input_features": ["symptoms_list", "vital_signs", "patient_history", "age", "gender"],
-#         "pred": lambda features: {
-#             "primary": "Common Cold" if "cough" in features["symptoms_list"] and "runny nose" in features["symptoms_list"] else
-#                       "Migraine" if "headache" in features["symptoms_list"] and features.get("patient_history", "").lower().find("migraine") >= 0 else
-#                       "Gastritis" if "abdominal pain" in features["symptoms_list"] and "nausea" in features["symptoms_list"] else
-#                       "Hypertension" if features.get("vital_signs", {}).get("blood_pressure_systolic", 120) > 140 else
-#                       "Unknown",
-#             "confidence": 0.85,
-#             "alternatives": ["Flu", "Allergic Rhinitis", "Sinusitis"]
-#         }
-#     },
-#     "SeverityEstimator": {
-#         "input_features": ["symptoms", "duration", "progression_rate", "pain_level", "age"],
-#         "pred": lambda features: {
-#             "score": min(9, 1 + int(features.get("duration", 1)/2) + int(features.get("pain_level", 0))),
-#             "urgency": "High" if int(features.get("pain_level", 0)) > 7 else
-#                       "Medium" if int(features.get("pain_level", 0)) > 4 else
-#                       "Low"
-#         }
-#     },
-#     "TreatmentRecommender": {
-#         "input_features": ["diagnosis", "patient_age", "patient_gender", "medical_history", "current_medications"],
-#         "pred": lambda features: {
-#             "recommendations": [
-#                 "Rest and hydration" if features["diagnosis"] in ["Common Cold", "Flu"] else None,
-#                 "Over-the-counter pain relievers" if features["diagnosis"] in ["Headache", "Migraine", "Common Cold"] else None,
-#                 "Prescription medication" if features["diagnosis"] in ["Hypertension", "Diabetes"] else None,
-#                 "Lifestyle modifications" if features["diagnosis"] in ["Hypertension", "Obesity", "Diabetes"] else None,
-#                 "Urgent medical attention" if features["diagnosis"] in ["Stroke", "Heart Attack"] else None
-#             ],
-#             "follow_up": "2 weeks" if features["diagnosis"] in ["Hypertension", "Diabetes"] else "As needed"
-#         }
-#     }
-# }
 
-DISEASE_FEATURES = {
-    "parkinsons": ["MDVP_Fo_Hz", "MDVP_Fhi_Hz", "MDVP_Flo_Hz", "MDVP_Jitter_percent", 
-                   "MDVP_Jitter_Abs", "MDVP_RAP", "MDVP_PPQ", "Jitter_DDP", "MDVP_Shimmer", 
-                   "MDVP_Shimmer_dB", "Shimmer_APQ3", "Shimmer_APQ5", "MDVP_APQ", 
-                   "Shimmer_DDA", "NHR", "HNR", "RPDE", "D2", "DFA", "spread1", "spread2", 
-                   "D2_duplicate", "PPE"],
-                   
-    "pancreatic_cancer": ["sample_id", "patient_cohort", "sample_origin", "age", "sex", 
-                          "diagnosis", "stage", "benign_sample_diagnosis", "plasma_CA19_9", 
-                          "creatinine"],
 
-    "asthma": ["Tiredness", "Dry_Cough", "Difficulty_in_Breathing", "Sore_Throat", 
-               "None_Sympton", "Pains", "Nasal_Congestion", "Runny_Nose", "None_Experiencing", 
-               "Age_0_9"],
-
-    "alzheimers": ["patient_id", "age", "gender", "ethnicity", "education_level", "bmi", 
-                   "smoking", "alcohol_consumption", "physical_activity", "diet_quality"],
-
-    "diabetes": ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", 
-                 "BMI", "DiabetesPedigreeFunction", "Age"],
-
-    "thyroid": ["age", "sex", "on_thyroxine", "query_on_thyroxine", "on_antithyroid_medication", 
-                "sick", "pregnant", "thyroid_surgery", "treatment", "query_hypothyroid", 
-                "query_hyperthyroid", "lithium", "goitre", "tumor", "hypopituitary", "psych", 
-                "TSH_measured", "TSH", "T3_measured", "T3", "TT4_measured", "TT4", 
-                "T4U_measured", "T4U", "FTI_measured", "FTI", "TBG_measured", "TBG", 
-                "referral_source"],
-
-    "kidney_disease": ["age", "blood_pressure", "specific_gravity", "albumin", "sugar", 
-                       "red_blood_cells", "pus_cell", "pus_cell_clumps", "bacteria", 
-                       "blood_glucose_random", "blood_urea", "serum_creatinine", "sodium", 
-                       "potassium", "haemoglobin", "packed_cell_volume", 
-                       "white_blood_cell_count", "red_blood_cell_count", "hypertension", 
-                       "diabetes_mellitus", "coronary_artery_disease", "appetite", 
-                       "peda_edema", "aanemia", "class_label"],
-
-    "liver_disease": ["Age", "Gender", "Total_Bilirubin", "Direct_Bilirubin", 
-                      "Alkaline_Phosphotase", "Alamine_Aminotransferase", 
-                      "Aspartate_Aminotransferase", "Total_Protiens", "Albumin", 
-                      "Albumin_and_Globulin_Ratio"]
-}
 
 
 
 # -----------------> defining different portions of our code <---------------
 ML_MODELS = {
-    "DiseaseClassifier": {
-        "input_features": ["symptom_text", "duration_days", "severity_scale", "patient_age", "patient_gender"],
-        "pred": lambda features: classify_disease(features)  # Replace with function
+    "Asthma_Predictor": {
+        "input_features": [
+    "Tiredness", "Dry-Cough", "Difficulty-in-Breathing", "Sore-Throat", "None_Sympton",
+    "Pains", "Nasal-Congestion", "Runny-Nose", "None_Experiencing", "Age_0-9",
+    "Age_10-19", "Age_20-24", "Age_25-59", "Age_60+", "Gender_Female", "Gender_Male"
+],
+        "pred": lambda features: predict_asthma({
+    "Tiredness": 1,
+    "Dry-Cough": 1,
+    "Difficulty-in-Breathing": 1,
+    "Sore-Throat": 0,
+    "None_Sympton": 0,
+    "Pains": 0,
+    "Nasal-Congestion": 1,
+    "Runny-Nose": 0,
+    "None_Experiencing": 0,
+    "Age_0-9": 1,
+    "Age_10-19": 0,
+    "Age_20-24": 0,
+    "Age_25-59": 0,
+    "Age_60+": 0,
+    "Gender_Female": 0,
+    "Gender_Male": 1
+})
     },
-    "DiseasePredictor": {
-        "input_features": DISEASE_FEATURES,  # Use disease-specific feature mapping
-        "pred": lambda disease_name, features: predict_disease(disease_name, MODEL_PATHS[disease_name], features)  
+    "Diabetes_predictor": {
+        "input_features": [
+        "Pregnancies",
+        "Glucose",
+        "BloodPressure",
+        "SkinThickness",
+        "Insulin",
+        "BMI",
+        "DiabetesPedigreeFunction",
+        "Age"
+      ],  # Use disease-specific feature mapping
+        "pred": lambda features: predict_diabetes({
+    "Pregnancies": 2,
+    "Glucose": 140,
+    "BloodPressure": 80,
+    "SkinThickness": 20,
+    "Insulin": 90,
+    "BMI": 30.0,
+    "DiabetesPedigreeFunction": 0.5,
+    "Age": 45
+})  
     },
-    "SeverityEstimator": {
-        "input_features": ["symptoms", "duration", "progression_rate", "pain_level", "age"],
-        "pred": lambda features: estimate_severity(features)
+    "Alzheimers_Predictor": {
+        "input_features": [
+        "age",
+        "gender",
+        "ethnicity",
+        "education_level",
+        "bmi",
+        "smoking",
+        "alcohol_consumption",
+        "physical_activity",
+        "diet_quality"],
+        "pred": lambda features: predict_alzheimers({"age": 35,
+    "gender": "Female",
+    "ethnicity": "Caucasian",
+    "education_level": "Bachelor's Degree",
+    "bmi": 25.5,
+    "smoking": "Non-smoker",
+    "alcohol_consumption": "Moderate",
+    "physical_activity": "Regular",
+    "diet_quality": "Good" 
+    })
     },
-    "TreatmentRecommender": {
-        "input_features": ["diagnosis", "patient_age", "patient_gender", "medical_history", "current_medications"],
-        "pred": lambda features: recommend_treatment(features)
+    "Liver_Disease_Predictor": {
+        "input_features": ["Age",
+        "Gender",
+        "Total_Bilirubin",
+        "Direct_Bilirubin",
+        "Alkaline_Phosphotase",
+        "Alamine_Aminotransferase",
+        "Aspartate_Aminotransferase",
+        "Total_Protiens",
+        "Albumin",
+        "Albumin_and_Globulin_Ratio"],
+        "pred": lambda features: predict_liver({"Age": 50,
+    "Gender": "Male",
+    "Total_Bilirubin": 1.2,
+    "Direct_Bilirubin": 0.3,
+    "Alkaline_Phosphotase": 85,
+    "Alamine_Aminotransferase": 35,
+    "Aspartate_Aminotransferase": 30,
+    "Total_Protiens": 6.8,
+    "Albumin": 4.2,
+    "Albumin_and_Globulin_Ratio": 1.2})
     }
 }
 
 
 
-# -------------------> classification = which disease type <-------------------
 
 
-def classify_disease(features):
-    symptom_text = features["symptom_text"].lower()
-    
-    if any(word in symptom_text for word in ["cough", "cold", "breath"]):
-        return "Respiratory"
-    elif any(word in symptom_text for word in ["nausea", "stomach ache"]) :
-        return "Digestive"
-    elif "headache" in symptom_text:
-        return "Neurological"
-    elif "chest pain" in symptom_text:
-        return "Cardiovascular"
-    else:
-        return "General"
-
-
-
-# ----------> which disease which function to run for prediction <-----------------
-
-def predict_disease(disease_name, model_path, input_data):
-    disease_mapping = {
-        "parkinsons": predict_parkinsons,
-        "pancreatic_cancer": predict_pancreatic_cancer,
-        "asthma": predict_asthma,
-        "alzheimers": predict_alzheimers,
-        "diabetes": predict_diabetes,
-        "thyroid": predict_thyroid,
-        "kidney_disease": predict_kidney_disease,
-        "liver_disease": prediction_liver
-    }
-
-    if disease_name in disease_mapping:
-        return disease_mapping[disease_name](model_path, input_data)
-    return "Error: Disease not recognized"
-
-
-
-
-# ------------> category specific which diseases  <---------------
-
-CATEGORY_TO_DISEASES = {
-    "Respiratory": ["asthma"],
-    "Digestive": ["pancreatic_cancer", "liver_disease"],
-    "Neurological": ["parkinsons", "alzheimers"],
-    "Cardiovascular": ["hypertension"],
-    "General": ["diabetes", "thyroid", "kidney_disease"]
-}
 
 
 # -----------> which variables to run <-------------
 
-def predict_disease_from_category(category, input_data):
-    if category not in CATEGORY_TO_DISEASES:
-        return {"error": "Unknown category"}
+# def predict_disease_from_category(category, input_data):
+#     if category not in CATEGORY_TO_DISEASES:
+#         return {"error": "Unknown category"}
     
-    possible_diseases = CATEGORY_TO_DISEASES[category]
-    results = {}
+#     possible_diseases = CATEGORY_TO_DISEASES[category]
+#     results = {}
 
-    for disease in possible_diseases:
-        model_path = MODEL_PATHS.get(disease, None)
-        if model_path:
-            results[disease] = predict_disease(disease, model_path, input_data)
+#     for disease in possible_diseases:
+#         model_path = MODEL_PATHS.get(disease, None)
+#         if model_path:
+#             results[disease] = predict_disease(disease, model_path, input_data)
 
-    # Select the most confident result (if applicable)
-    best_diagnosis = max(results, key=lambda d: results[d]["confidence"], default="Unknown")
+#     # Select the most confident result (if applicable)
+#     best_diagnosis = max(results, key=lambda d: results[d]["confidence"], default="Unknown")
 
-    return {"diagnosis": best_diagnosis, "details": results}
+#     return {"diagnosis": best_diagnosis, "details": results}
 
 
-
-# -----------> all model paths <----------
-MODEL_PATHS = {
-    "parkinsons": "path/to/parkinsons_model.pkl",
-    "pancreatic_cancer": "path/to/pancreatic_model.pkl",
-    "asthma": "path/to/asthma_model.pkl",
-    "alzheimers": "path/to/alzheimers_model.pkl",
-    "diabetes": "path/to/diabetes_model.pkl",
-    "thyroid": "path/to/thyroid_model.pkl",
-    "kidney_disease": "path/to/kidney_model.pkl",
-    "liver_disease": "path/to/liver_model.pkl"
-}
 
 
 
