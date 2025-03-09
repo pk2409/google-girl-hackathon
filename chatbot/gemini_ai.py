@@ -30,9 +30,22 @@ MAX_TOKENS = 1000
 ML_MODELS = {
     "Asthma_Predictor": {
         "input_features": [
-    "Tiredness", "Dry-Cough", "Difficulty-in-Breathing", "Sore-Throat", "None_Sympton",
-    "Pains", "Nasal-Congestion", "Runny-Nose", "None_Experiencing", "Age_0-9",
-    "Age_10-19", "Age_20-24", "Age_25-59", "Age_60+", "Gender_Female", "Gender_Male"
+     ["Tiredness", "int"],
+    ["Dry-Cough", "int"],
+    ["Difficulty-in-Breathing", "int"],
+    ["Sore-Throat", "int"],
+    ["None_Sympton", "int"],
+    ["Pains", "int"],
+    ["Nasal-Congestion", "int"],
+    ["Runny-Nose", "int"],
+    ["None_Experiencing", "int"],
+    ["Age_0-9", "int"],
+    ["Age_10-19", "int"],
+    ["Age_20-24", "int"],
+    ["Age_25-59", "int"],
+    ["Age_60+", "int"],
+    ["Gender_Female", "int"],
+    ["Gender_Male", "int"]
 ],
         "pred": lambda features: predict_asthma({
     "Tiredness": 1,
@@ -55,14 +68,14 @@ ML_MODELS = {
     },
     "Diabetes_predictor": {
         "input_features": [
-        "Pregnancies",
-        "Glucose",
-        "BloodPressure",
-        "SkinThickness",
-        "Insulin",
-        "BMI",
-        "DiabetesPedigreeFunction",
-        "Age"
+         ["Pregnancies", "int"],
+    ["Glucose", "int"],
+    ["BloodPressure", "int"],
+    ["SkinThickness", "int"],
+    ["Insulin", "int"],
+    ["BMI", "float"],
+    ["DiabetesPedigreeFunction", "float"],
+    ["Age", "int"]
       ],  # Use disease-specific feature mapping
         "pred": lambda features: predict_diabetes({
     "Pregnancies": 2,
@@ -77,15 +90,15 @@ ML_MODELS = {
     },
     "Alzheimers_Predictor": {
         "input_features": [
-        "age",
-        "gender",
-        "ethnicity",
-        "education_level",
-        "bmi",
-        "smoking",
-        "alcohol_consumption",
-        "physical_activity",
-        "diet_quality"],
+         ["age", "int"],
+    ["gender", "str"],
+    ["ethnicity", "str"],
+    ["education_level", "str"],
+    ["bmi", "float"],
+    ["smoking", "str"],
+    ["alcohol_consumption", "str"],
+    ["physical_activity", "str"],
+    ["diet_quality", "str"]],
         "pred": lambda features: predict_alzheimers({"age": 35,
     "gender": "Female",
     "ethnicity": "Caucasian",
@@ -98,16 +111,16 @@ ML_MODELS = {
     })
     },
     "Liver_Disease_Predictor": {
-        "input_features": ["Age",
-        "Gender",
-        "Total_Bilirubin",
-        "Direct_Bilirubin",
-        "Alkaline_Phosphotase",
-        "Alamine_Aminotransferase",
-        "Aspartate_Aminotransferase",
-        "Total_Protiens",
-        "Albumin",
-        "Albumin_and_Globulin_Ratio"],
+        "input_features": [["Age", "int"],
+    ["Gender", "str"],
+    ["Total_Bilirubin", "float"],
+    ["Direct_Bilirubin", "float"],
+    ["Alkaline_Phosphotase", "int"],
+    ["Alamine_Aminotransferase", "int"],
+    ["Aspartate_Aminotransferase", "int"],
+    ["Total_Protiens", "float"],
+    ["Albumin", "float"],
+    ["Albumin_and_Globulin_Ratio", "float"]],
         "pred": lambda features: predict_liver({"Age": 50,
     "Gender": "Male",
     "Total_Bilirubin": 1.2,
