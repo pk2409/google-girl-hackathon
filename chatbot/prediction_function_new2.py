@@ -21,27 +21,27 @@ def predict_liver_disease(model_path, input_data_liver):
 model_path = r'working-on-it\models\model_liver.pkl'  # Update this if the filename is different
 
 
-sample_input = [
-    100,  # Age
-     1,   # Gender (e.g., 1 for Male, 0 for Female)
-     1.2,  # Total Bilirubin
-        0.5,  # Direct Bilirubin
-        200,  # Alkaline Phosphotase
-        30,   # Alamine Aminotransferase
-        40,   # Aspartate Aminotransferase
-        6.5,  # Total Proteins
-        3.2,  # Albumin
-        1.1   # Albumin and Globulin Ratio
-    ]
+# sample_input = [
+#     100,  # Age
+#      1,   # Gender (e.g., 1 for Male, 0 for Female)
+#      1.2,  # Total Bilirubin
+#         0.5,  # Direct Bilirubin
+#         200,  # Alkaline Phosphotase
+#         30,   # Alamine Aminotransferase
+#         40,   # Aspartate Aminotransferase
+#         6.5,  # Total Proteins
+#         3.2,  # Albumin
+#         1.1   # Albumin and Globulin Ratio
+#     ]
 
-    # Run the test
-prediction = predict_liver_disease(model_path, sample_input)
+#     # Run the test
+# prediction = predict_liver_disease(model_path, sample_input)
 
-    # Print the result
-if prediction is not None:
-    if prediction == 2:
-        prediction = 0
-print("Predicted Class:", prediction)
+#     # Print the result
+# if prediction is not None:
+#     if prediction == 2:
+#         prediction = 0
+# print("Predicted Class:", prediction)
 
 
 
@@ -53,7 +53,7 @@ import joblib
 import pandas as pd
 def predict_asthma(input_data_asthma):
 
-    model_path = r'working-on-it\models\model_asthma.pkl' 
+    model_path = r'models\model_asthma.pkl' 
     
     feature_names = [
     "Tiredness", "Dry-Cough", "Difficulty-in-Breathing", "Sore-Throat", "None_Sympton",

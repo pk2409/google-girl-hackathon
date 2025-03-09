@@ -280,18 +280,28 @@ def get_response(user_input: str) -> str:
         if analysis["has_symptoms"]:
             print("here")
             print(analysis)
+            print(features)
             for model_name, model_info in ML_MODELS.items():
                 required_features = model_info.get("input_features", [])
-                if all(feature in features and features[feature] for feature in required_features):
+                print("prisha bakchodi mat kr")
+                all_features_present = True
+                for feature in required_features:
+                    if feature[0] not in features:
+                        all_features_present = False
+                        break
+
+                if(all_features_present):
+                    print("chlgy soja")
                     model_selection = {
                         "model_name": model_name,
-                        "feature_values": {feature: features[feature] for feature in required_features}
+                        "feature_values": {feature[0]: features[feature[0]] for feature in required_features}
                     }
                     runnable_models.append(model_selection)
             print(1)
             # Run the ML models with the provided feature values
+            print(runnable_models)
             model_results = run_ml_models(runnable_models)
-            print(2)
+            print(model_results)
             # Construct a prompt for the final medical response
             final_prompt = f"""
             Based on the following ML model predictions for the user's symptoms:
