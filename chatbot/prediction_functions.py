@@ -165,3 +165,65 @@ def prediction_liver(model_path,input_data_liver):
         if prediction == 2:
             prediction = 0
     print("Predicted Class:", prediction)
+
+
+
+
+# -------------------> ASTHMA PREDICTION <----------------
+# def prediction_asthma(model_path, input_data_asthma):
+
+import joblib
+import pandas as pd
+def predict_asthma(model_path, input_data_asthma):
+    
+    feature_names = [
+    "Tiredness", "Dry-Cough", "Difficulty-in-Breathing", "Sore-Throat", "None_Sympton",
+    "Pains", "Nasal-Congestion", "Runny-Nose", "None_Experiencing", "Age_0-9",
+    "Age_10-19", "Age_20-24", "Age_25-59", "Age_60+", "Gender_Female", "Gender_Male"
+]
+    with open(model_path, "rb") as file:
+        model = joblib.load(file)
+        print("Asthma Model loaded successfully!")
+
+    input_df = pd.DataFrame([input_data_asthma], columns=feature_names)
+    prediction = model.predict(input_df)
+
+    return int(prediction[0])
+
+model_path = r'C:\Users\prish\Desktop\try2_models\model_asthma\model_asthma.pkl'  
+
+sample_input = [1, 1, 1, 0, 0, 0, 1, 0, 0, 1,0,0,0,0,0,1]  
+prediction = predict_asthma(model_path, sample_input)
+print("Predicted Class:", prediction)
+    
+
+
+
+
+# -----------> KIDNEY DISEASE PREDICTION <-------------
+# import joblib
+# import pandas as pd
+# def predict_asthma(model_path, input_data_asthma):
+    
+#     feature_names = ["age", "blood_pressure", "specific_gravity", "albumin", "sugar", "red_blood_cells", 
+#      "pus_cell", "pus_cell_clumps", "bacteria", "blood_glucose_random", "blood_urea", 
+#      "serum_creatinine", "sodium", "potassium", "haemoglobin", "packed_cell_volume", 
+#      "white_blood_cell_count", "red_blood_cell_count", "hypertension", "diabetes_mellitus", 
+#      "coronary_artery_disease", "appetite", "peda_edema", "aanemia"
+    
+# ]
+#     with open(model_path, "rb") as file:
+#         model = joblib.load(file)
+#         print("Kidney disease detection Model loaded successfully!")
+
+#     input_df = pd.DataFrame([input_data_asthma], columns=feature_names)
+#     prediction = model.predict(input_df)
+
+#     return int(prediction[0])
+
+# model_path = r'C:\Users\prish\Desktop\try2_models\model_alzheimer\kidney_disease.pkl'  
+
+# sample_input = [1, 1, 1, 0, 0, 0, 1, 0, 0, 1,0,0,0,0,0,1]  
+# prediction = predict_asthma(model_path, sample_input)
+# print("Predicted Class:", prediction)
+    
