@@ -1,6 +1,6 @@
 # import google.generativeai as genai
 
-from prediction_function_new import predict_liver , predict_asthma , predict_diabetes , predict_alzheimers
+from prediction_function_new2 import predict_liver , predict_asthma , predict_diabetes , predict_alzheimers
 
 
 
