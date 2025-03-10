@@ -14,8 +14,9 @@ export default function Home() {
             Get your Diagnosis with AI-Powered Chatbots
           </h1>
           <p className="text-gray-600 mb-6">
-            An intelligent chatbot platform designed to streamline
-            communication, automate responses, and boost customer engagement.
+            An AI-powered medical diagnostic assistant designed to enhance
+            patient interaction, automate preliminary assessments, and support
+            faster healthcare decisions.
           </p>
           <Button
             className="px-6 py-3 bg-gray-200 border-gray-300 text-gray-700 text-lg"
@@ -37,23 +38,23 @@ export default function Home() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 ">
           <FeatureBox
             // imgSrc =
-            title="Scalable Chatbot"
-            desc="Connect with users anytime, anywhere with smart automation."
+            title="AI-Powered Medical Diagnosis"
+            desc="Accurately analyze symptoms and provide instant preliminary assessments."
           />
           <FeatureBox
             // imgSrc =
-            title="AI Power"
-            desc="Leverage advanced AI for intelligent responses & API integrations."
+            title="Smart Healthcare Connectivity"
+            desc="Seamlessly integrate with hospital systems and electronic health records (EHR)."
           />
           <FeatureBox
-            // imgSrc=
+            // imgSrc =
             title="Multilingual Support"
-            desc="Expand your business globally with language support."
+            desc="Ensure accessibility for diverse populations with multiple language options."
           />
           <FeatureBox
             // imgSrc =
-            title="Expert Assistance"
-            desc="Get consulting and support from AI professionals."
+            title="Expert-Backed Insights"
+            desc="Utilize AI-driven recommendations supported by medical professionals."
           />
         </div>
       </div>

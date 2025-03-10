@@ -53,7 +53,7 @@ import joblib
 import pandas as pd
 def predict_asthma(input_data_asthma):
 
-    model_path = r'models\model_asthma.pkl' 
+    model_path = r'C:\Users\prish\Desktop\try3\working-on-it\models\model_asthma.pkl' 
     
     feature_names = [
     "Tiredness", "Dry-Cough", "Difficulty-in-Breathing", "Sore-Throat", "None_Sympton",
@@ -75,23 +75,23 @@ def predict_asthma(input_data_asthma):
  
 
 
-prediction = predict_asthma({"Tiredness": 1,
-    "Dry-Cough": 1,
-    "Difficulty-in-Breathing": 1,
-    "Sore-Throat": 0,
-    "None_Sympton": 0,
-    "Pains": 0,
-    "Nasal-Congestion": 1,
-    "Runny-Nose": 0,
-    "None_Experiencing": 0,
-    "Age_0-9": 1,
-    "Age_10-19": 0,
-    "Age_20-24": 0,
-    "Age_25-59": 0,
-    "Age_60+": 0,
-    "Gender_Female": 0,
-    "Gender_Male": 1})
-print("Predicted Class:", prediction)
+# prediction = predict_asthma({"Tiredness": 1,
+#     "Dry-Cough": 1,
+#     "Difficulty-in-Breathing": 1,
+#     "Sore-Throat": 0,
+#     "None_Sympton": 0,
+#     "Pains": 0,
+#     "Nasal-Congestion": 1,
+#     "Runny-Nose": 0,
+#     "None_Experiencing": 0,
+#     "Age_0-9": 1,
+#     "Age_10-19": 0,
+#     "Age_20-24": 0,
+#     "Age_25-59": 0,
+#     "Age_60+": 0,
+#     "Gender_Female": 0,
+#     "Gender_Male": 1})
+# print("Predicted Class:", prediction)
     
 
 

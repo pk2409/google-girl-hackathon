@@ -293,7 +293,6 @@ def get_response(user_input: str) -> str:
             print(99)
             for model_name, model_info in ML_MODELS.items():
                 required_features = model_info.get("input_features", [])
-                print("prisha bakchodi mat kr")
                 all_features_present = True
                 for feature in required_features:
                     if feature[0] not in features:
@@ -301,13 +300,16 @@ def get_response(user_input: str) -> str:
                         break
 
                 if(all_features_present):
-                    print("chlgy soja")
                     model_selection = {
                         "model_name": model_name,
                         "feature_values": {feature[0]: features[feature[0]] for feature in required_features}
                     }
                     runnable_models.append(model_selection)
                     models_to_run.remove(model_name)
+                    try:
+                        models_to_run.remove(model_name)
+                    except ValueError:
+                        print(ValueError)
             print(1)
             # Run the ML models with the provided feature values
             print(runnable_models)
@@ -325,6 +327,8 @@ def get_response(user_input: str) -> str:
             Model Predictions:
             {model_results}
             If Features to be asked is not empty then frame a reply to ask the question to get the features from the user.
+            Do not use bold,italics or special characters in the response
+
             and then Provide a comprehensive medical assessment incorporating these predictions.
             Explain what each model is suggesting in plain language.
             Include any recommended next steps for the user.
