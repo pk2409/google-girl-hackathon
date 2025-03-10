@@ -18,6 +18,7 @@ pending_features = {}  # Stores missing features for each user
 collected_feature_values = {}  # Stores collected values
 conversation_history = []
 features={}
+models_to_run = []
 # Maximum token limit
 MAX_TOKENS = 1000
 
@@ -195,7 +196,7 @@ def run_ml_models(model_selections):
 
 def get_response(user_input: str) -> str:
     """Process user input and generate appropriate response"""
-    global conversation_history, features
+    global conversation_history, features , models_to_run
     
     # Add user input to conversation history
     conversation_history.append("User: " + user_input)
@@ -204,7 +205,11 @@ def get_response(user_input: str) -> str:
     conversation_history = trim_history(conversation_history, MAX_TOKENS)
     # Initialize Gemini client
     client = genai.Client(api_key="AIzaSyAAe-WQyIvOHdxAgB5AnqZ4BcGsoCBQG6c")
-    
+    ML = {}
+    for m in models_to_run:
+        ML[m]=ML_MODELS[m]
+    if not ML:
+        ML= ML_MODELS
     # Construct the main prompt that does most of the work
     main_prompt = f"""
     Based on the following prompt, check whether the user is listing medical symptoms or not:
@@ -215,27 +220,24 @@ def get_response(user_input: str) -> str:
     
     If the user IS listing symptoms, identify those symptoms and check which of the following ML models they can be used with:
     
-    {ML_MODELS}
+    {ML}
+    I already have some features do not add these:
+    {features}
     
     For each applicable model, return:
     1. The model name
     2. A list of feature values that can be extracted from the user's input
     3. Default values for any missing required features
     4. key of features is to be taken from ML_MODELS
-
-     For features_to_be_asked, include only features that:
-    1. Are required by at least one ML model
-    2. Cannot be determined from the user's input
-    3. Are reasonable for the user to know without medical testing
-
+    5. Do not add any extra keys
+    6. Do not assume features that the user can aswer
+    7. append all features/symtoms inside the key features do not make a new key nomaed on the model_name
     Return your response in this format:
     {{
       "has_symptoms": true/false,
 
       "models_to_run": [
-        {{
-          "model_name": "ModelName",
-        }},
+         "ModelName",
         ...
       ],
       "features": {{
@@ -243,8 +245,6 @@ def get_response(user_input: str) -> str:
         "feature2": "extracted_value2",
         ...
       }},
-      "ask_for_more_data": "Yes/No",
-      "features_to_be_asked": ["feature3", "feature4", ...],
       "direct_response": "Only include this if has_symptoms is false - your direct response to the user"
     }}
     """
@@ -281,6 +281,16 @@ def get_response(user_input: str) -> str:
             print("here")
             print(analysis)
             print(features)
+            models_to_run=analysis["models_to_run"]
+            ask_features= list()
+            for model in analysis["models_to_run"]:
+                print(model)
+                print(ML_MODELS[model]["input_features"])
+                for f in ML_MODELS[model]["input_features"]:
+                    # print(f[0])
+                    if f[0] not in features:
+                        ask_features.append(f[0])
+            print(99)
             for model_name, model_info in ML_MODELS.items():
                 required_features = model_info.get("input_features", [])
                 print("prisha bakchodi mat kr")
@@ -297,6 +307,7 @@ def get_response(user_input: str) -> str:
                         "feature_values": {feature[0]: features[feature[0]] for feature in required_features}
                     }
                     runnable_models.append(model_selection)
+                    models_to_run.remove(model_name)
             print(1)
             # Run the ML models with the provided feature values
             print(runnable_models)
@@ -309,7 +320,7 @@ def get_response(user_input: str) -> str:
             User Input: "{user_input}"
         
             Pending Features:
-            "{analysis["features_to_be_asked"]}"
+            "{ask_features}"
 
             Model Predictions:
             {model_results}
@@ -317,6 +328,10 @@ def get_response(user_input: str) -> str:
             and then Provide a comprehensive medical assessment incorporating these predictions.
             Explain what each model is suggesting in plain language.
             Include any recommended next steps for the user.
+            NOTE:
+            1. do not list symptoms that are already answered until necessay.
+            2. return in a frmat no ***
+            3. you can use \\n to format it in a better way as it will be printed
             """
             
             # Get the final medical response
