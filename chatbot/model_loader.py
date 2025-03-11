@@ -5,8 +5,8 @@ from PIL import Image
 image_classifier = tf.keras.models.load_model("models/image_classifier.h5")
 
 MODELS = {
-    "lung_scan": ["models/model1model.h5", "models/model2.h5"],
-    "brain_mri": ["models/model3.h5"],
+    "lung_scan": ["models/covid_model.h5", "models/pneumonia_model.h5"],
+    "brain_mri": ["models/brain_tumor_model.h5"],
 }
 
 def predict_image_type(image):
